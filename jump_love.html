@@ -6,7 +6,7 @@
     <title>Salta por Amor ❤️</title>
     <style>
         body { text-align: center; font-family: Arial, sans-serif; }
-        canvas { background: url('https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/paisaje.png') no-repeat center center; background-size: cover; display: block; margin: 20px auto; }
+        canvas { background: url('/paisaje.png') no-repeat center center; background-size: cover; display: block; margin: 20px auto; }
         #message { display: none; font-size: 24px; font-weight: bold; color: red; }
         #restartButton { 
             display: none; 
@@ -33,11 +33,11 @@
         const ctx = canvas.getContext("2d");
         let player, player2, obstacles, score, gameOver, won, jumpTime;
         const playerImg = new Image();
-        playerImg.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/player3.png";
+        playerImg.src = "/player3.png";
         const player2Img = new Image();
-        player2Img.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/player2.png";
+        player2Img.src = "/player2.png";
         const backgroundImg = new Image();
-        backgroundImg.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/paisaje.png";
+        backgroundImg.src = "/paisaje.png";
 
         function resetGame() {
             player = { x: 50, y: 250, width: 40, height: 40, velocityY: 0, jumping: false };
