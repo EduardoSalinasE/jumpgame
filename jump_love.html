@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salta por Amor ❤️</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        canvas { background: url('https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/paisaje.png') no-repeat center center; background-size: cover; display: block; margin: 20px auto; }
+        #message { display: none; font-size: 24px; font-weight: bold; color: red; }
+        #restartButton { 
+            display: none; 
+            padding: 10px 20px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #score { font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Salta por Amor ❤️</h1>
+    <p>Presiona la tecla <strong>ESPACIO</strong> o haz clic para saltar.</p>
+    <p id="score">Puntos: 0</p>
+    <canvas id="gameCanvas" width="800" height="300"></canvas>
+    <p id="message">¡Felicidades, mi amor! 🎉</p>
+    <button id="restartButton" onclick="resetGame()">Jugar de nuevo</button>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        let player, player2, obstacles, score, gameOver, won, jumpTime;
+        const playerImg = new Image();
+        playerImg.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/player3.png";
+        const player2Img = new Image();
+        player2Img.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/player2.png";
+        const backgroundImg = new Image();
+        backgroundImg.src = "https://raw.githubusercontent.com/EduardoSalinasE/ekha/refs/heads/main/imagenes/paisaje.png";
+
+        function resetGame() {
+            player = { x: 50, y: 250, width: 40, height: 40, velocityY: 0, jumping: false };
+            player2 = null;
+            obstacles = [];
+            score = 0;
+            gameOver = false;
+            won = false;
+            jumpTime = 0;
+            document.getElementById("message").style.display = "none";
+            document.getElementById("restartButton").style.display = "none";
+            document.getElementById("score").textContent = "Puntos: 0";
+            update();
+        }
+        
+        function drawPlayer() {
+            ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+            if (player2) {
+                ctx.drawImage(player2Img, player2.x, player2.y, player2.width, player2.height);
+            }
+        }
+        
+        function drawObstacles() {
+            ctx.fillStyle = "red";
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
+        
+        function update() {
+            if (gameOver) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawObstacles();
+            
+            player.velocityY += 1;
+            player.y += player.velocityY;
+            if (player.y >= 250) {
+                player.y = 250;
+                player.jumping = false;
+            }
+            
+            if (player2) {
+                player2.velocityY += 1;
+                player2.y += player2.velocityY;
+                if (player2.y >= 250) {
+                    player2.y = 250;
+                    player2.jumping = false;
+                }
+                if (player2.x > player.x + 50) {
+                    player2.x -= 3;
+                }
+            }
+            
+            obstacles.forEach(obstacle => {
+                obstacle.x -= 5;
+                if (obstacle.x + obstacle.width < 0) {
+                    obstacles.splice(obstacles.indexOf(obstacle), 1);
+                    score++;
+                    document.getElementById("score").textContent = "Puntos: " + score;
+                }
+                
+                if (!won &&
+                    player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y
+                ) {
+                    gameOver = true;
+                    document.getElementById("message").innerHTML = "Sigue intentando 💪";
+                    document.getElementById("message").style.display = "block";
+                    setTimeout(resetGame, 2000);
+                }
+            });
+            
+            if (score >= 10 && !won) {
+                won = true;
+                player2 = { x: canvas.width, y: 250, width: 40, height: 40, velocityY: 0, jumping: false };
+                document.getElementById("message").innerHTML = "¡Felicidades, mi amor! 🎉";
+                document.getElementById("message").style.display = "block";
+                jumpTime = 120; 
+            }
+            
+            if (player2 && player2.x <= player.x + 50 && jumpTime > 0) {
+                if (!player.jumping) {
+                    player.velocityY = -15;
+                    player.jumping = true;
+                }
+                if (!player2.jumping) {
+                    player2.velocityY = -15;
+                    player2.jumping = true;
+                }
+                jumpTime--;
+                if (jumpTime === 0) {
+                    document.getElementById("restartButton").style.display = "block";
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+        
+        function jump() {
+            if (!player.jumping) {
+                player.velocityY = -15;
+                player.jumping = true;
+            }
+        }
+        
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space") jump();
+        });
+        document.addEventListener("click", jump);
+        
+        function generateObstacle() {
+            let height = Math.random() * 50 + 20;
+            obstacles.push({ x: canvas.width, y: 300 - height, width: 20, height: height });
+        }
+        setInterval(() => {
+            if (!gameOver && !won) generateObstacle();
+        }, 2000);
+        
+        resetGame();
+    </script>
+</body>
+</html>
